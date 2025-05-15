@@ -1,0 +1,15 @@
+{% block search_export_link %}
+  {% if type == "dataset" and count > 0 %}
+    {% if g.user %}
+      <form action="{{ h.url_for('search_export.search_export_create') }}" method="post" style="display: inline;">
+        {{ h.csrf_input() }}
+        <input type="hidden" name="q" value="{{ query }}">
+        <input type="hidden" name="type" value="{{ type }}">
+        <input type="hidden" name="fields" value="{{ fields|tojson|urlencode }}">
+        <button type="submit" class="btn btn-primary" title="{{ _('Export search results') }}">
+          <i class="fa fa-download"></i> {{ _('Export') }}
+        </button>
+      </form>
+    {% endif %}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{#
+   Available context:
+   - dataset_type
+   - q
+   - sorting
+   - sort_by_selected
+   - page.item_count
+   - facets
+   - query_error
+   - fields
+#}
+{% ckan_extends %}
+
+{% block page_primary_action %}
+  {% if h.check_access('package_create') %}
+    <div class="page_primary_action">
+      {% snippet 'snippets/add_dataset.html', dataset_type=dataset_type %}
+      {% snippet 'snippets/search_export_link.html', query=q, count=page.item_count, type=dataset_type, facets=facets, fields=fields %}
+    </div>
+  {% endif %}
+{% endblock %}

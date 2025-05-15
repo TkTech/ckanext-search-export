@@ -1,0 +1,48 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Exporting...') }}{% endblock %}
+
+{# Just hides the sidebar. #}
+{% block secondary %}
+{% endblock %}
+
+{% block meta %}
+  {{ super() }}
+  {% if not result %}
+  <meta http-equiv="refresh" content="5">
+  {% endif %}
+{% endblock %}
+
+{% block primary_content %}
+  <article class="module">
+    <div class="module-content">
+      {% if not result %}
+        <h1 class="page-heading">{{ _('Exporting...') }}</h1>
+        <p>
+          {% trans %}
+            We're getting your export ready, please wait a moment...
+          {% endtrans %}
+        </p>
+        <p>
+          {% trans %}
+            This may take several minutes depending on the number of search results. You can
+            return to this page later to download your export.
+          {% endtrans %}
+        </p>
+        </div>
+      {% elif result.type != result.Type.SUCCESSFUL %}
+        <h1 class="page-heading">{{ _('Something went wrong...') }}</h1>
+        <p>
+          {% trans %}
+            We're sorry, but there was an error while exporting your search results.
+          {% endtrans %}
+        </p>
+      {% elif result.type == result.Type.SUCCESSFUL %}
+        <h1 class="page-heading">{{ _('Export Ready') }}</h1>
+        <a href="{{ h.url_for_static("uploads/search_export/" + result.return_value["filename"]) }}" class="btn btn-primary">
+          <i class="fa fa-download"></i>
+          {{ _('Download your export') }}
+        </a>
+      {% endif %}
+  </article>
+{% endblock %}
