@@ -16,7 +16,7 @@ large portals with millions of datasets.
 Install the extension using pip:
 
 ```bash
-pip install ckanxt-search-export
+pip install -e "git+https://github.com/TkTech/ckanext-search-export.git#egg=ckanext-search-export"
 ```
 
 Then add `ckanext-search-export` to the `ckan.plugins` setting in your `ckan.ini` file:
