@@ -3,6 +3,8 @@ import csv
 import secrets
 import os.path
 from tempfile import NamedTemporaryFile
+from typing import Optional
+
 from werkzeug.datastructures import FileStorage
 
 import ckan.plugins.toolkit as toolkit
@@ -18,8 +20,8 @@ def export_to_file(
     username: str,
     output: io.FileIO,
     *,
-    q: str | None = None,
-    fields: list[tuple[str, str]] | None = None,
+    q: Optional[str] = None,
+    fields: Optional[list[tuple[str, str]]] = None,
     file_type: str = "csv",
     chunk_size: int = 1000,
 ):
@@ -95,8 +97,8 @@ def export_to_file(
 def export_search_results(
     username: str,
     *,
-    q: str | None = None,
-    fields: list[tuple[str, str]] | None = None,
+    q: Optional[str] = None,
+    fields: Optional[list[tuple[str, str]]] = None,
     file_type: str = "csv",
 ):
     """
