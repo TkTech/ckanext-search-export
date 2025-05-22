@@ -1,11 +1,13 @@
 import io
 import csv
+import secrets
+import os.path
 from tempfile import NamedTemporaryFile
 from werkzeug.datastructures import FileStorage
 
 import ckan.plugins.toolkit as toolkit
 from ckan import authz
-from ckan.lib.uploader import get_uploader
+from ckan.lib.uploader import get_uploader, Upload
 
 from ckanext.search_export.constants import Status
 
@@ -123,12 +125,14 @@ def export_search_results(
 
         tmp_file.seek(0)
 
+        filename = f"{secrets.token_urlsafe(128)}.{file_type}"
         storage = FileStorage(
             tmp_file,
-            filename=f"search_export.{file_type}",
+            filename=filename,
             content_type="text/csv",
         )
 
+        # This entire IUploader interface is exceptionally hacky.
         data_dict = { "url": None, "file": storage }
         uploader = get_uploader('search_export')
         uploader.update_data_dict(
@@ -137,6 +141,14 @@ def export_search_results(
             file_field="file",
             clear_field="clear",
         )
+        if isinstance(uploader, Upload):
+            # The default uploader will mangle our name so badly it removes
+            # all randomness, which is actually impressive. This hack reverts
+            # the munging that the default uploader does to restore randomness.
+            uploader.filename = filename
+            uploader.filepath = os.path.join(uploader.storage_path, filename)
+            data_dict["url"] = filename
+
         uploader.upload()
 
         return { "filename": data_dict["url"] }

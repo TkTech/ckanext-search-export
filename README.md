@@ -1,4 +1,4 @@
-# ckanxt-search-export
+# ckanext-search-export
 
 Adds an export button to search results, allowing logged-in users to download 
 the results without futzing with the API.
