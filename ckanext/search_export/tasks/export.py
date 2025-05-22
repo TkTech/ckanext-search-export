@@ -9,10 +9,10 @@ import ckan.plugins.toolkit as toolkit
 from ckan import authz
 from ckan.lib.uploader import get_uploader, Upload
 
-from ckanext.search_export.constants import Status
 
 class EmptyResultError(Exception):
     """Exception raised when no results are found for the given query."""
+
 
 def export_to_file(
     username: str,
@@ -20,8 +20,8 @@ def export_to_file(
     *,
     q: str | None = None,
     fields: list[tuple[str, str]] | None = None,
-    file_type: str = 'csv',
-    chunk_size: int = 1000
+    file_type: str = "csv",
+    chunk_size: int = 1000,
 ):
     """
     Export search results to a file.
@@ -34,23 +34,21 @@ def export_to_file(
     :param chunk_size: The number of rows to fetch in each chunk.
     """
     args = {
-        'q': q,
-        'facet': False,
-        'fq_list': [
-            f"{field}:{value}" for field, value in fields
-        ] if fields else [],
-        'include_private': authz.is_sysadmin(username)
+        "q": q,
+        "facet": False,
+        "fq_list": [f"{field}:{value}" for field, value in fields] if fields else [],
+        "include_private": authz.is_sysadmin(username),
     }
 
     # Get a single search result to get the column headers and to ensure
     # there's at least one result. The IUploader interface will fail if the
     # result file is empty since it can't guess the mimetype.
-    response = toolkit.get_action('package_search')(
+    response = toolkit.get_action("package_search")(
         {"user": username},
-        {**args, 'start': 0, 'rows': 1},
+        {**args, "start": 0, "rows": 1},
     )
 
-    results = response.get('results', [])
+    results = response.get("results", [])
     if not results:
         raise EmptyResultError("No results found for the given query.")
 
@@ -60,8 +58,8 @@ def export_to_file(
     # a text-like object.
     encoded_wrapper = io.TextIOWrapper(
         output,
-        encoding='utf-8',
-        newline='',
+        encoding="utf-8",
+        newline="",
     )
 
     writer = csv.DictWriter(encoded_wrapper, fieldnames=columns)
@@ -70,16 +68,16 @@ def export_to_file(
     # Paginate through the results in chunks.
     offset = 0
     while True:
-        response = toolkit.get_action('package_search')(
+        response = toolkit.get_action("package_search")(
             {"user": username},
             {
                 **args,
-                'start': offset,
-                'rows': chunk_size,
-            }
+                "start": offset,
+                "rows": chunk_size,
+            },
         )
 
-        results = response.get('results', [])
+        results = response.get("results", [])
         if not results:
             break
 
@@ -99,7 +97,7 @@ def export_search_results(
     *,
     q: str | None = None,
     fields: list[tuple[str, str]] | None = None,
-    file_type: str = 'csv',
+    file_type: str = "csv",
 ):
     """
     Export search results to a file and upload it using CKAN's configured
@@ -117,7 +115,7 @@ def export_search_results(
                 tmp_file,
                 q=q,
                 fields=fields,
-                file_type='csv',
+                file_type="csv",
             )
         except EmptyResultError:
             # TODO: Handle failure case.
@@ -133,8 +131,8 @@ def export_search_results(
         )
 
         # This entire IUploader interface is exceptionally hacky.
-        data_dict = { "url": None, "file": storage }
-        uploader = get_uploader('search_export')
+        data_dict = {"url": None, "file": storage}
+        uploader = get_uploader("search_export")
         uploader.update_data_dict(
             data_dict,
             url_field="url",
@@ -151,4 +149,4 @@ def export_search_results(
 
         uploader.upload()
 
-        return { "filename": data_dict["url"] }
+        return {"filename": data_dict["url"]}
