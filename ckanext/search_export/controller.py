@@ -5,11 +5,7 @@ import ckan.plugins.toolkit as toolkit
 import ckan.lib.base as base
 import ckan.lib.jobs as jobs
 
-try:
-    # New in CKAN 2.10.
-    from ckan.common import current_user
-except ImportError:
-    from flask_login import current_user
+from ckan.common import g
 
 from ckanext.search_export.tasks import export
 
@@ -18,7 +14,7 @@ def search_export_create():
     """
     View to create a search export job.
     """
-    if not current_user.is_active:
+    if not g.userobj:
         return base.abort(403, "You must be logged in to access this page.")
 
     q = toolkit.request.form.get("q")
@@ -33,7 +29,7 @@ def search_export_create():
 
     job: jobs.Job = jobs.enqueue(
         export.export_search_results,
-        [current_user.name],
+        [g.userobj.name],
         {
             "q": q,
             "fields": fields,
@@ -52,11 +48,11 @@ def search_export_status(job_id: str):
 
     :param job_id: The ID of the job to check.
     """
-    if not current_user.is_active:
+    if not g.userobj:
         return base.abort(403, "You must be logged in to access this page.")
 
     job = jobs.job_from_id(job_id)
-    if job.args[0] != current_user.name:
+    if job.args[0] != g.userobj.name:
         return toolkit.abort(403, "You do not have permission to access this job.")
 
     return toolkit.render(
