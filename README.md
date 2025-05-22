@@ -19,10 +19,10 @@ Install the extension using pip:
 pip install -e "git+https://github.com/TkTech/ckanext-search-export.git#egg=ckanext-search-export"
 ```
 
-Then add `ckanext-search-export` to the `ckan.plugins` setting in your `ckan.ini` file:
+Then add `search-export` to the `ckan.plugins` setting in your `ckan.ini` file:
 
 ```ini
-ckan.plugins = ... ckanext-search-export
+ckan.plugins = ... search-export
 ```
 
 Ensure that file storage is already enabled in your `ckan.ini`:
